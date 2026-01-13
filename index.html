@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resepku - Kumpulan Resep Makanan & Minuman</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #FAF7F2;
+            background-image: url('https://i.ibb.co.com/dJcChw1K/background-website.jpg');
+            background-size: 300px;
+            background-repeat: repeat;
+            background-attachment: fixed;
+            color: #e7b569;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #D4A574 0%, #C9956E 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .search-section {
+            background-color: white;
+            padding: 2rem;
+            margin: 2rem auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 800px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #E8DCC4;
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #searchInput:focus {
+            border-color: #D4A574;
+            box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+        }
+
+        .search-btn {
+            padding: 15px 30px;
+            background-color: #D4A574;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .search-btn:hover {
+            background-color: #C9956E;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background-color: #F5EDE0;
+            color: #5D4E37;
+            border: 2px solid #E8DCC4;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #D4A574;
+            color: white;
+            border-color: #D4A574;
+        }
+
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .recipe-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+        }
+
+        .recipe-title {
+            font-size: 1.4rem;
+            color: #5D4E37;
+            margin-bottom: 0.5rem;
+        }
+
+        .recipe-category {
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: #A8D5BA;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-description {
+            color: #8B7355;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .view-recipe-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #D4A574;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .view-recipe-btn:hover {
+            background-color: #C9956E;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            overflow-y: auto;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2rem auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            position: relative;
+            padding: 0;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: #5D4E37;
+            margin-bottom: 1rem;
+        }
+
+        .ingredients-section, .steps-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #D4A574;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #E8DCC4;
+            padding-bottom: 0.5rem;
+        }
+
+        .ingredients-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .ingredients-list li {
+            padding: 0.5rem 0;
+            padding-left: 30px;
+            position: relative;
+            color: #5D4E37;
+        }
+
+        .ingredients-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #A8D5BA;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .steps-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .steps-list li {
+            counter-increment: step-counter;
+            padding: 1rem 0;
+            padding-left: 50px;
+            position: relative;
+            color: #5D4E37;
+            border-left: 3px solid #E8DCC4;
+            margin-bottom: 1rem;
+        }
+
+        .steps-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #D4A574;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #8B7355;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            background-color: #5D4E37;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .recipes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 1rem auto;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🍳 Resepku</h1>
+            <p class="tagline">Kumpulan Resep Makanan & Minuman Pilihan</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari resep favorit Anda...">
+                <button class="search-btn" onclick="searchRecipes()">Cari</button>
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterRecipes('semua')">Semua</button>
+                <button class="filter-btn" onclick="filterRecipes('makanan utama')">Makanan Utama</button>
+                <button class="filter-btn" onclick="filterRecipes('camilan')">Camilan</button>
+                <button class="filter-btn" onclick="filterRecipes('minuman')">Minuman</button>
+                <button class="filter-btn" onclick="filterRecipes('dessert')">Dessert</button>
+            </div>
+        </div>
+
+        <div id="recipesContainer" class="recipes-grid"></div>
+        <div id="noResults" class="no-results" style="display: none;">
+            Tidak ada resep yang ditemukan. Coba kata kunci lain!
+        </div>
+    </div>
+
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img id="modalImage" class="modal-image" src="" alt="">
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h2 id="modalTitle" class="modal-title"></h2>
+                <div class="ingredients-section">
+                    <h3 class="section-title">Bahan-Bahan</h3>
+                    <ul id="modalIngredients" class="ingredients-list"></ul>
+                </div>
+                <div class="steps-section">
+                    <h3 class="section-title">Langkah-Langkah</h3>
+                    <ol id="modalSteps" class="steps-list"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><strong>Resepku</strong> - Kumpulan Resep Pilihan</p>
+            <p>© 2026 Resepku by Nabila Belva Fawnia. Semua hak cipta dilindungi.</p>
+        </div>
+    </footer>
+
+    <script>
+        const recipes = [
+            {
+                id: 1,
+                name: "Nasi Goreng Spesial",
+                category: "makanan utama",
+                image: "https://i.ibb.co.com/M5R4zWX7/nasi-goreng-spesial.jpg",
+                description: "Nasi goreng dengan bumbu rempah khas Indonesia, dilengkapi telur mata sapi dan kerupuk.",
+                ingredients: [
+                    "3 piring nasi putih",
+                    "2 butir telur",
+                    "3 siung bawang putih",
+                    "5 siung bawang merah",
+                    "2 sdm kecap manis",
+                    "1 sdt garam",
+                    "1 sdt merica",
+                    "2 sdm minyak goreng",
+                    "Daun bawang secukupnya",
+                    "Kerupuk untuk pelengkap"
+                ],
+                steps: [
+                    "Haluskan bawang putih dan bawang merah, lalu tumis hingga harum.",
+                    "Masukkan telur, orak-arik hingga setengah matang.",
+                    "Tambahkan nasi putih, aduk rata dengan bumbu.",
+                    "Tuang kecap manis, garam, dan merica. Aduk hingga merata.",
+                    "Masak hingga nasi tercampur sempurna dan harum.",
+                    "Tambahkan daun bawang, aduk sebentar.",
+                    "Sajikan dengan telur mata sapi dan kerupuk."
+                ]
+            },
+            {
+                id: 2,
+                name: "Soto Ayam",
+                category: "makanan utama",
+                image: "https://i.ibb.co.com/rR7wg3P1/soto-ayam.jpg",
+                description: "Soto ayam kuah kuning dengan bumbu rempah yang segar dan menghangatkan.",
+                ingredients: [
+                    "500 gram daging ayam",
+                    "2 liter air",
+                    "5 siung bawang putih",
+                    "6 siung bawang merah",
+                    "3 cm kunyit",
+                    "2 cm jahe",
+                    "2 batang serai",
+                    "3 lembar daun salam",
+                    "Garam dan gula secukupnya",
+                    "Mie soun, tauge, telur rebus untuk pelengkap"
+                ],
+                steps: [
+                    "Rebus ayam hingga matang, angkat dan suwir-suwir.",
+                    "Haluskan bawang putih, bawang merah, kunyit, dan jahe.",
+                    "Tumis bumbu halus bersama serai dan daun salam hingga harum.",
+                    "Masukkan bumbu ke dalam kaldu ayam, masak hingga mendidih.",
+                    "Tambahkan garam dan gula, koreksi rasa.",
+                    "Siapkan mangkuk, masukkan mie soun, tauge, dan ayam suwir.",
+                    "Tuang kuah soto panas, tambahkan telur rebus dan pelengkap lainnya."
+                ]
+            },
+            {
+                id: 3,
+                name: "Pisang Goreng Crispy",
+                category: "camilan",
+                image: "https://i.ibb.co.com/GfX4g3VZ/pisang-goreng-chrispy.jpg",
+                description: "Pisang goreng dengan lapisan tepung renyah dan manis, cocok untuk teman minum teh.",
+                ingredients: [
+                    "6 buah pisang kepok",
+                    "100 gram tepung terigu",
+                    "50 gram tepung beras",
+                    "2 sdm gula pasir",
+                    "1/2 sdt garam",
+                    "1/2 sdt vanili",
+                    "150 ml air",
+                    "Minyak goreng secukupnya"
+                ],
+                steps: [
+                    "Campurkan tepung terigu, tepung beras, gula, garam, dan vanili.",
+                    "Tambahkan air sedikit demi sedikit sambil diaduk hingga adonan kental.",
+                    "Kupas pisang, belah memanjang jika suka.",
+                    "Celupkan pisang ke dalam adonan hingga terbalut rata.",
+                    "Panaskan minyak dalam wajan dengan api sedang.",
+                    "Goreng pisang hingga berwarna kuning keemasan dan crispy.",
+                    "Angkat dan tiriskan, sajikan hangat."
+                ]
+            },
+            {
+                id: 4,
+                name: "Risoles Mayo",
+                category: "camilan",
+                image: "https://i.ibb.co.com/7dt066zm/risoles-mayo.jpg",
+                description: "Risoles lembut berisi sayuran dan mayones, dengan kulit yang renyah.",
+                ingredients: [
+                    "10 lembar kulit lumpia",
+                    "2 buah wortel, potong dadu kecil",
+                    "100 gram buncis, iris",
+                    "3 sdm mayones",
+                    "1 siung bawang putih",
+                    "Garam dan merica secukupnya",
+                    "2 butir telur untuk celupan",
+                    "Tepung panir secukupnya",
+                    "Minyak goreng"
+                ],
+                steps: [
+                    "Tumis bawang putih hingga harum, masukkan wortel dan buncis.",
+                    "Masak hingga sayuran setengah matang, tambahkan garam dan merica.",
+                    "Angkat, dinginkan, lalu campurkan dengan mayones.",
+                    "Ambil kulit lumpia, isi dengan sayuran mayo, lipat dan rekatkan.",
+                    "Celupkan risoles ke dalam telur kocok, lalu gulingkan di tepung panir.",
+                    "Panaskan minyak, goreng risoles hingga kuning keemasan.",
+                    "Angkat, tiriskan, dan sajikan hangat."
+                ]
+            },
+            {
+                id: 5,
+                name: "Es Teh Manis",
+                category: "minuman",
+                image: "https://i.ibb.co.com/DgjbQNk8/es-teh-manis.jpg",
+                description: "Minuman segar es teh manis yang sempurna untuk menemani hari panas.",
+                ingredients: [
+                    "2 kantong teh celup atau 2 sdt teh tubruk",
+                    "500 ml air panas",
+                    "3 sdm gula pasir (sesuai selera)",
+                    "Es batu secukupnya",
+                    "Daun mint untuk hiasan (opsional)"
+                ],
+                steps: [
+                    "Seduh teh dengan air panas, diamkan 3-5 menit.",
+                    "Angkat kantong teh, tambahkan gula, aduk hingga larut.",
+                    "Biarkan teh hingga suhu ruangan.",
+                    "Siapkan gelas, masukkan es batu.",
+                    "Tuang teh manis ke dalam gelas berisi es.",
+                    "Tambahkan daun mint jika suka, sajikan segera."
+                ]
+            },
+            {
+                id: 6,
+                name: "Jus Alpukat",
+                category: "minuman",
+                image: "https://i.ibb.co.com/PGcJCnRs/jus-alpukat.jpg",
+                description: "Jus alpukat creamy dan segar dengan tambahan susu dan cokelat.",
+                ingredients: [
+                    "1 buah alpukat matang",
+                    "200 ml susu cair",
+                    "2 sdm susu kental manis",
+                    "1 sdm cokelat bubuk",
+                    "Es batu secukupnya",
+                    "Air secukupnya jika perlu"
+                ],
+                steps: [
+                    "Belah alpukat, ambil dagingnya dengan sendok.",
+                    "Masukkan alpukat, susu cair, susu kental manis, dan es batu ke blender.",
+                    "Blender hingga halus dan creamy.",
+                    "Jika terlalu kental, tambahkan sedikit air.",
+                    "Tuang ke dalam gelas saji.",
+                    "Taburi cokelat bubuk di atasnya.",
+                    "Sajikan segera selagi dingin."
+                ]
+            },
+            {
+                id: 7,
+                name: "Brownies Cokelat",
+                category: "dessert",
+                image: "https://i.ibb.co.com/DH9GVn1t/brownies-coklat.jpg",
+                description: "Brownies cokelat lembut dan fudgy yang meleleh di mulut.",
+                ingredients: [
+                    "200 gram dark chocolate",
+                    "150 gram mentega",
+                    "3 butir telur",
+                    "150 gram gula pasir",
+                    "100 gram tepung terigu",
+                    "30 gram cokelat bubuk",
+                    "1/2 sdt garam",
+                    "1 sdt vanili ekstrak"
+                ],
+                steps: [
+                    "Lelehkan dark chocolate dan mentega dengan cara double boiler.",
+                    "Kocok telur dan gula hingga mengembang dan pucat.",
+                    "Masukkan cokelat leleh ke dalam kocokan telur, aduk rata.",
+                    "Ayak tepung terigu, cokelat bubuk, dan garam.",
+                    "Masukkan tepung ke adonan basah, aduk perlahan dengan spatula.",
+                    "Tuang adonan ke loyang yang sudah dialasi kertas roti.",
+                    "Panggang di oven 180°C selama 25-30 menit.",
+                    "Keluarkan, dinginkan, potong sesuai selera."
+                ]
+            },
+            {
+                id: 8,
+                name: "Puding Cokelat",
+                category: "dessert",
+                image: "https://i.ibb.co.com/GQ9yLPQB/pudding-coklat.jpg",
+                description: "Puding cokelat lembut dan dingin yang sempurna untuk hidangan penutup.",
+                ingredients: [
+                    "1 bungkus agar-agar cokelat",
+                    "100 gram gula pasir",
+                    "50 gram cokelat bubuk",
+                    "800 ml susu cair",
+                    "1 sdt vanili ekstrak",
+                    "Whipped cream untuk topping"
+                ],
+                steps: [
+                    "Campurkan agar-agar, gula, dan cokelat bubuk dalam panci.",
+                    "Tuang susu cair sedikit demi sedikit sambil diaduk.",
+                    "Masak dengan api sedang sambil terus diaduk hingga mendidih.",
+                    "Tambahkan vanili ekstrak, aduk rata.",
+                    "Tuang ke dalam cetakan, diamkan hingga agak dingin.",
+                    "Masukkan ke kulkas hingga set minimal 2 jam.",
+                    "Keluarkan dari cetakan, hias dengan whipped cream."
+                ]
+            },
+            {
+                id: 9,
+                name: "Matcha Latte",
+                category: "minuman",
+                image: "https://i.ibb.co.com/xSyLkD2h/matcha-latte.jpg",
+                description: "Minuman matcha latte creamy dan lembut, cocok dinikmati hangat maupun dingin.",
+                ingredients: [
+                    "1 sdt bubuk matcha",
+                    "2 sdm air panas",
+                    "200 ml susu cair",
+                    "Gula cair atau madu secukupnya",
+                    "Es batu (opsional)"
+                ],
+                steps: [
+                    "Larutkan bubuk matcha dengan air panas hingga tidak menggumpal.",
+                    "Panaskan atau siapkan susu dingin sesuai selera.",
+                    "Tambahkan gula atau madu ke dalam susu.",
+                    "Tuang susu ke dalam larutan matcha.",
+                    "Tambahkan es batu jika ingin versi dingin.",
+                    "Aduk perlahan dan sajikan."
+                ]
+            },
+            {
+                id: 10,
+                name: "Dimsum Mentai",
+                category: "camilan",
+                image: "https://i.ibb.co.com/SXTtt6kK/dimsum-mentai.jpg",
+                description: "Dimsum ayam lembut dengan saus mentai creamy yang gurih dan menggugah selera.",
+                ingredients: [
+                    "250 gram daging ayam fillet",
+                    "100 gram udang kupas",
+                    "2 siung bawang putih",
+                    "1 butir telur",
+                    "2 sdm tepung tapioka",
+                    "1 sdm saus tiram",
+                    "1 sdt minyak wijen",
+                    "Garam dan merica secukupnya",
+                    "Kulit dimsum secukupnya",
+                    "5 sdm mayones",
+                    "2 sdm saus sambal",
+                    "1 sdt saus tomat",
+                    "1/2 sdt kecap asin",
+                    "Air jeruk nipis secukupnya",
+                    "Tobiko (opsional)"
+                ],
+                steps: [
+                    "Campurkan ayam, udang, dan bumbu hingga rata.",
+                    "Tambahkan telur dan tepung tapioka, aduk hingga lembut.",
+                    "Isi adonan ke dalam kulit dimsum.",
+                    "Kukus dimsum selama 15 menit hingga matang.",
+                    "Campurkan semua bahan saus mentai.",
+                    "Siram saus mentai di atas dimsum.",
+                    "Panggang sebentar hingga saus sedikit kecokelatan.",
+                    "Sajikan dimsum mentai selagi hangat."
+                ]
+            },
+            {
+                id: 11,
+                name: "Spaghetti Bolognese",
+                category: "makanan utama",
+                image: "https://i.ibb.co.com/rGrP3shX/spaghetti-bolognese.jpg",
+                description: "Spaghetti dengan saus bolognese khas Italia yang gurih dan kaya rasa.",
+                ingredients: [
+                    "250 gram spaghetti",
+                    "200 gram daging sapi cincang",
+                    "1 buah bawang bombay",
+                    "2 siung bawang putih",
+                    "200 ml saus tomat",
+                    "2 sdm pasta tomat",
+                    "1 sdt oregano kering",
+                    "1 sdt basil kering",
+                    "Garam secukupnya",
+                    "Merica secukupnya",
+                    "Gula secukupnya",
+                    "2 sdm minyak zaitun",
+                    "Keju parmesan parut (opsional)"
+                ],
+                steps: [
+                    "Rebus spaghetti hingga al dente, tiriskan.",
+                    "Tumis bawang bombay dan bawang putih hingga harum.",
+                    "Masukkan daging sapi cincang dan masak hingga matang.",
+                    "Tambahkan saus tomat, pasta tomat, dan rempah-rempah.",
+                    "Bumbui dengan garam, merica, dan gula secukupnya.",
+                    "Masak saus hingga mengental.",
+                    "Sajikan spaghetti dengan saus bolognese di atasnya.",
+                    "Taburi keju parmesan jika suka."
+                ]
+            },
+            {
+                id: 12,
+                name: "Ayam Geprek Mozzarella",
+                category: "makanan utama",
+                image: "https://i.ibb.co.com/D2p7FBK/ayam-geprek-mozarella.jpg",
+                description: "Ayam goreng tepung renyah dengan sambal geprek pedas dan keju mozzarella yang meleleh.",
+                ingredients: [
+                    "500 gram dada ayam fillet",
+                    "1 sdt garam",
+                    "1/2 sdt merica",
+                    "1 sdt bawang putih bubuk",
+                    "1 butir telur",
+                    "100 gram tepung terigu",
+                    "50 gram tepung maizena",
+                    "Minyak goreng secukupnya",
+                    "10 buah cabai rawit merah",
+                    "3 siung bawang putih",
+                    "Garam dan gula secukupnya",
+                    "150 gram keju mozzarella parut"
+                ],
+                steps: [
+                    "Bumbui ayam dengan garam, merica, dan bawang putih bubuk.",
+                    "Celupkan ayam ke telur dan balurkan ke tepung.",
+                    "Goreng ayam hingga renyah dan matang.",
+                    "Ulek cabai, bawang putih, garam, dan gula.",
+                    "Siram sambal dengan minyak panas.",
+                    "Geprek ayam dengan sambal.",
+                    "Taburi keju mozzarella.",
+                    "Panggang hingga keju meleleh dan sajikan."
+                ]
+            }
+        ];
+
+        let currentFilter = 'semua';
+        let searchQuery = '';
+
+        function displayRecipes(recipesToShow) {
+            const container = document.getElementById('recipesContainer');
+            const noResults = document.getElementById('noResults');
+            
+            if (recipesToShow.length === 0) {
+                container.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'grid';
+            noResults.style.display = 'none';
+            container.innerHTML = '';
+
+            recipesToShow.forEach(recipe => {
+                const card = document.createElement('div');
+                card.className = 'recipe-card';
+                card.innerHTML = `
+                    <img src="${recipe.image}" alt="${recipe.name}" class="recipe-image">
+                    <div class="recipe-content">
+                        <h3 class="recipe-title">${recipe.name}</h3>
+                        <span class="recipe-category">${recipe.category.toUpperCase()}</span>
+                        <p class="recipe-description">${recipe.description}</p>
+                        <button class="view-recipe-btn" onclick="openModal(${recipe.id})">Lihat Resep</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterRecipes(category) {
+            currentFilter = category;
+            
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            applyFilters();
+        }
+
+        function searchRecipes() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            applyFilters();
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchRecipes();
+            }
+        });
+
+        function applyFilters() {
+            let filtered = recipes;
+
+            if (currentFilter !== 'semua') {
+                filtered = filtered.filter(recipe => recipe.category === currentFilter);
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(recipe => 
+                    recipe.name.toLowerCase().includes(searchQuery) ||
+                    recipe.description.toLowerCase().includes(searchQuery) ||
+                    recipe.category.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            displayRecipes(filtered);
+        }
+
+        function openModal(recipeId) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            document.getElementById('modalImage').src = recipe.image;
+            document.getElementById('modalTitle').textContent = recipe.name;
+
+            const ingredientsList = document.getElementById('modalIngredients');
+            ingredientsList.innerHTML = '';
+            recipe.ingredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                li.textContent = ingredient;
+                ingredientsList.appendChild(li);
+            });
+
+            const stepsList = document.getElementById('modalSteps');
+            stepsList.innerHTML = '';
+            recipe.steps.forEach(step => {
+                const li = document.createElement('li');
+                li.textContent = step;
+                stepsList.appendChild(li);
+            });
+
+            document.getElementById('recipeModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('recipeModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('recipeModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        displayRecipes(recipes);
+    </script>
+</body>
+</html>
